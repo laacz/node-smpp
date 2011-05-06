@@ -7,53 +7,71 @@
  */
 
 var PDUFactory = require('../lib/pdu-factory.js');
+var Constants = require('../lib/constants.js');
+var Defs = Constants.defs;
 var Assert = require('assert');
 
+var octets;
+var params = {};
+
 // Malformed PDUs
-var p = PDUFactory.fromBuffer('', function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromBuffer('\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00', function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromBuffer(Buffer('\x00\x00\x00\x10\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x01', 'binary'), function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromBuffer(Buffer('\x00\x00\x00\x10\x00\x00\x00\x01\xff\xff\xff\xff\x00\x00\x00\x01', 'binary'), function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromBuffer(Buffer('\x00\x00\x00\x10\x00\x00\x00\x21\x00\x00\x00\x00\x00\x00\x00\x01', 'binary'), function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
+PDUFactory.fromBuffer('', function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+octets = [0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00].map(function(a){return String.fromCharCode(a);}).join('');
+PDUFactory.fromBuffer(octets, function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+octets = [0x00, 0x00, 0x00, 0x10, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01].map(function(a){return String.fromCharCode(a);}).join('');
+PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+octets = [0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x01].map(function(a){return String.fromCharCode(a);}).join('');
+PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+octets = [0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01].map(function(a){return String.fromCharCode(a);}).join('');
+PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
 
 // Correct bind_transceiver
-var p = PDUFactory.fromBuffer(Buffer("\x00\x00\x00\x2b\x00\x00\x00\x09\x00\x00\x00\x00\x00\x19\x9b\x6ffoofoofo\x00barbarba\x00\x45\x53\x4d\x45\x00\x34\x00\x00\x00", 'binary'), function(err, pdu) { Assert.ok(pdu !== null); console.log('[ok]', pdu.command_name, pdu.command_status_name)});
+octets = [0x00, 0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x9b, 0x6, 0x66, 0x66, 0x6f, 0x6f, 0x66, 0x6f, 0x6f, 0x66, 0x6f, 0x00, 0x62, 0x61, 0x72, 0x62, 0x61, 0x72, 0x62, 0x00, 0x45, 0x53, 0x4d, 0x45, 0x00, 0x34, 0x00, 0x00, 0x00].map(function(a){return String.fromCharCode(a);}).join('');
+PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) { Assert.ok(err === null); console.log('[ok]', pdu.command_name, pdu.command_status_name);});
 
 // Correct submit_sm
-var p = PDUFactory.fromBuffer(Buffer("\x00\x00\x00\xa6\x00\x00\x00\x04\x00\x00\x00\x00\x00\x19\xa6\xf9\x00\x05\x00\x4b\x4b\x4b\x4b\x4b\x20\x4b\x4b\x4b\x4b\x00\x01\x00\x33\x37\x31\x32\x32\x32\x32\x32\x32\x32\x32\x00\x00\x00\x03\x00\x30\x30\x30\x30\x30\x37\x30\x30\x30\x30\x30\x30\x30\x30\x30\x52\x00\x01\x00\x00\x00\x54\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x15\x05\x00\x02\x54\x53\x15\x03\x00\x02\x00\xab", 'binary'), function(err, pdu) { Assert.ok(err === null); console.log('[ok]', pdu.command_name, pdu.command_status_name)});
+octets = [0x00, 0x00, 0x00, 0xa6, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0xa6, 0xf9, 0x00, 0x05, 0x00, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x20, 0x4b, 0x4b, 0x4b, 0x4b, 0x00, 0x01, 0x00, 0x33, 0x37, 0x31, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x03, 0x00, 0x30, 0x30, 0x30, 0x30, 0x30, 0x37, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x52, 0x00, 0x01, 0x00, 0x00, 0x00, 0x54, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x15, 0x05, 0x00, 0x02, 0x54, 0x53, 0x15, 0x03, 0x00, 0x02, 0x00, 0xab].map(function(a){return String.fromCharCode(a);}).join('');
+
+PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) { Assert.ok(err === null); console.log('[ok]', pdu.command_name, pdu.command_status_name);});
 
 
 // Sanity checks
-var p = PDUFactory.fromStruct(-1, -1, -1, {}, function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromStruct(4, -1, -1, {}, function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
-var p = PDUFactory.fromStruct(4, 0, -1, {}, function(err, pdu) { Assert.ok('message' in err); console.log('[ok]', err.message)});
+PDUFactory.fromStruct(-1, -1, -1, {}, function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+PDUFactory.fromStruct(4, -1, -1, {}, function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
+PDUFactory.fromStruct(4, 0, -1, {}, function(err, pdu) { Assert.ok(err.message !== undefined); console.log('[ok]', err.message);});
 
-var p = PDUFactory.fromStruct(0x80000009, 0, -1, {'system_id': 'sys'}, function(err, pdu) { Assert.ok(err === null); console.log('[ok]', pdu.command_name, pdu.command_status_name)});
+PDUFactory.fromStruct(0x80000009, 0, -1, {'system_id': 'sys'}, function(err, pdu) { Assert.ok(err === null); console.log('[ok]', pdu.command_name, pdu.command_status_name);});
 
-var p = PDUFactory.fromStruct(0x80000009, 0, -1, {'system_id': 'sys', 'additional_status_info_text' : 'foobar'}, function(err, pdu) { Assert.ok(pdu.optional.additional_status_info_text === 'foobar'); console.log('[ok]', pdu.command_name, pdu.command_status_name)});
+PDUFactory.fromStruct(0x80000009, 0, -1, {'system_id': 'sys', 'additional_status_info_text' : 'foobar'}, function(err, pdu) { Assert.ok(pdu.optional.additional_status_info_text === 'foobar'); console.log('[ok]', pdu.command_name, pdu.command_status_name);});
 
 
-// Back and back again
+// There and back again
 var bufs = [
-            "\x00\x00\x00\x2b\x00\x00\x00\x09\x00\x00\x00\x00\x00\x19\x9b\x6ffoofoofo\x00barbarba\x00\x45\x53\x4d\x45\x00\x34\x00\x00\x00",
-            "\x00\x00\x00\xa6\x00\x00\x00\x04\x00\x00\x00\x00\x00\x19\xa6\xf9\x00\x05\x00\x4b\x4b\x4b\x4b\x4b\x20\x4b\x4b\x4b\x4b\x00\x01\x00\x33\x37\x31\x32\x32\x32\x32\x32\x32\x32\x32\x00\x00\x00\x03\x00\x30\x30\x30\x30\x30\x37\x30\x30\x30\x30\x30\x30\x30\x30\x30\x52\x00\x01\x00\x00\x00\x54\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x53\x15\x05\x00\x02\x54\x53\x15\x03\x00\x02\x00\xab"
+            [0x00, 0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x9b, 0x6f, 0x66, 0x66, 0x6f, 0x6f, 0x66, 0x66, 0x6f, 0x6f, 0x66, 0x00, 0x62, 0x61, 0x72, 0x62, 0x61, 0x72, 0x61, 0x00, 0x45, 0x53, 0x4d, 0x45, 0x00, 0x34, 0x00, 0x00, 0x00].map(function(a){return String.fromCharCode(a);}).join(''),
+            [0x00, 0x00, 0x00, 0xa6, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0xa6, 0xf9, 0x00, 0x05, 0x00, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x20, 0x4b, 0x4b, 0x4b, 0x4b, 0x00, 0x01, 0x00, 0x33, 0x37, 0x31, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x03, 0x00, 0x30, 0x30, 0x30, 0x30, 0x30, 0x37, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x52, 0x00, 0x01, 0x00, 0x00, 0x00, 0x54, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x53, 0x15, 0x05, 0x00, 0x02, 0x54, 0x53, 0x15, 0x03, 0x00, 0x02, 0x00, 0xab].map(function(a){return String.fromCharCode(a);}).join('')
            ];
 
-
+var buf = '';
 for (buf in bufs) {
-    var p = PDUFactory.fromBuffer(Buffer(bufs[buf], 'binary'), function(err, pdu) {
-        var params = pdu.mandatory;
-        for (var k in pdu.optional) {
+    octets = bufs[buf];
+    PDUFactory.fromBuffer(Buffer(octets, 'binary'), function(err, pdu) {
+        var k = '';
+        Assert.ok(err === null);
+        params = pdu.mandatory;
+        for (k in pdu.optional) {
             params[k] = pdu.optional[k];
         }
+
         PDUFactory.fromStruct(pdu.header.command_id, pdu.header.command_status, pdu.header.sequence_number, params, function(err, pdu2) {
-            Assert.ok(pdu2.buffer.toString() === pdu.buffer.toString())
-        })
+            if (err) { console.log(err); }
+            Assert.ok(pdu2.buffer.toString() === pdu.buffer.toString());
+        });
     });
 }
 // console.log(msg.split('').reduce(function(a, b){ return (a.length == 1 ? '\\x' + a.charCodeAt(0).toString(16) : a) + '\\x' + b.charCodeAt(0).toString(16);}))
 
-
-/*
- <Buffer 00 00 00 2b 00 00 00 09 00 00 00 00 00 19 fd 6f 66 6f 6f 66 6f 6f 66 6f 00 62 61 72 62 61 72 62 61 00 45 53 4d 45 00 34 00 00 00>
-*/
+var command_id;
+for (command_id in Constants.command_ids) {
+    console.log('Testing for definition for', Constants.command_ids[command_id], '0x' + (command_id>>>0).toString(16));
+    Assert.ok(Defs.commands[command_id] !== undefined);
+}
