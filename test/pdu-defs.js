@@ -7,7 +7,7 @@
  */
 
 var PDUFactory = require('pdu-factory');
-var Constants = require('constants');
+var Constants = require('pdu-defs');
 var Defs = Constants.defs;
 var Assert = require('assert');
 
