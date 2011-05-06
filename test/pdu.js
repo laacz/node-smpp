@@ -163,7 +163,7 @@ module.exports = {
         Assert.isUndefined(pdu2.command_name);
     },
 
-    'Response: well formed' : function() {
+    'Response: no body; well formed' : function() {
         PDUFactory.fromStruct(Constants.commands.enquire_link, Constants.command_statuses.esme_rok, 99, {}, function(err, pdu) {
             Assert.isNull(err, "Unexpected error: " + (err ? err.message : ''));
             PDUFactory.response(pdu, 0, {}, function(err2, pdu2) {
@@ -174,7 +174,7 @@ module.exports = {
         });
     },
 
-    'Response: well formed (no callback)' : function() {
+    'Response: no body; well formed (no callback)' : function() {
         var pdu = PDUFactory.fromStruct(Constants.commands.enquire_link, Constants.command_statuses.esme_rok, 99, {});
         Assert.isDefined(pdu.header.command_id, "Unexpected error: " + pdu);
 
@@ -183,5 +183,30 @@ module.exports = {
 
         Assert.ok(pdu2.header.command_id === ((pdu.header.command_id | 0x80000000)>>>0), 'Command id is not *_resp');
         Assert.ok(pdu2.header.squence_number === pdu.header.squence_number, 'Sequence_number for both commands should match');
+    },
+
+    'Response: with body; well formed' : function() {
+        var params = {
+            service_type: 'abc',
+            source_addr_ton: 1,
+            source_addr_npi: 1,
+            source_addr: '37122222222',
+            dest_addr_ton: 1,
+            dest_addr_npi: 2,
+            destination_addr: '37122222222',
+
+            esm_class: 1,
+            data_coding: 1
+        };
+
+        PDUFactory.fromStruct(Constants.commands.data_sm, Constants.command_statuses.esme_rok, 99, params, function(err, pdu) {
+            Assert.isNull(err, "Unexpected error #1: " + (err ? err.message : ''));
+            PDUFactory.response(pdu, 0, {message_id: 'abc'}, function(err2, pdu2) {
+                Assert.isNull(err2, "Unexpected error #2: " + (err2 ? err2.message : ''));
+                Assert.ok(pdu2.header.command_id === ((pdu.header.command_id | 0x80000000)>>>0), 'Command id is not *_resp');
+                Assert.ok(pdu2.header.squence_number === pdu.header.squence_number, 'Sequence_number for both commands should match');
+            });
+        });
     }
+
 };
