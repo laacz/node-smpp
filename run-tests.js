@@ -13,11 +13,9 @@ for (arg in process.argv) {
     if (process.argv[arg].substring(0, 2) === '--') {
         switch (process.argv[arg]) {
             case '--coverage':
-                sys.exec('jscoverage lib/ lib-cov/', function(error, stdout, stderr) {
-                    sys.exec('expresso -I lib-cov/ test/*', function(error, stdout, stderr) {
-                        console.log(stdout);
-                        console.log(stderr);
-                    });
+                sys.exec('expresso -c -I lib/ test/*', function(error, stdout, stderr) {
+                    console.log(stdout);
+                    console.log(stderr);
                 });
                 help = false;
                 break;
