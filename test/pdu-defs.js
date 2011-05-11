@@ -6,10 +6,11 @@
  * @copyright Copyright(c) 2011 - present Kaspars Foigts <laacz@laacz.lv>
  */
 
-var PDUFactory = require('pdu-factory');
-var Constants = require('pdu-defs');
-var Defs = Constants.defs;
 var Assert = require('assert');
+
+// node-smpp
+var Constants = require('../lib/pdu-defs.js');
+var Defs = Constants.defs;
 
 module.exports = {
     'Defs exist': function() {

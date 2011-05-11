@@ -7,7 +7,9 @@
  */
 
 var Assert = require('assert');
-var packunpack = require('packunpack');
+
+// node-smpp
+var packunpack = require('../lib/packunpack.js');
 var pack = packunpack.pack;
 var unpack = packunpack.unpack;
 
@@ -30,21 +32,8 @@ module.exports = {
         Assert.strictEqual(pack('N', 1678191).toString('binary'), toString([0x00, 0x19, 0x9b, 0x6f]));
     },
     'pack: exceptions': function() {
-        var error;
-        try {
-            error = false;
-            pack('Z', 1);
-        } catch (e) {
-            error = e;
-        }
-        Assert.ok(error !== false);
-        try {
-            error = false;
-            pack('NN', 1);
-        } catch (e) {
-            error = e;
-        }
-        Assert.ok(error !== false);
+        Assert.throws(function(){pack('Z', 1);});
+        Assert.throws(function(){pack('NN', 1);;});
     },
     'unpack: multipliers mix': function() {
         Assert.eql(unpack('n2c*', toString([0x12, 0x34, 0x13, 0x35, 0x41, 0x42])), [0x1234, 0x1335, 0x41, 0x42]);
@@ -70,9 +59,9 @@ module.exports = {
         var error; try { error = false; unpack('Z', "\x65"); } catch (e) { error = e; } Assert.ok(error !== false);
     },
     'unpack: input too short': function() {
-        var error; try { error = false; unpack('NN', "\x65"); } catch (e) { error = e; } Assert.ok(error !== false);
-        var error; try { error = false; unpack('c', ""); } catch (e) { error = e; } Assert.ok(error !== false);
-        var error; try { error = false; unpack('n*', "\x65"); } catch (e) { error = e; } Assert.ok(error !== false);
-        var error; try { error = false; unpack('n', "\x65"); } catch (e) { error = e; } Assert.ok(error !== false);
+        Assert.throws(function(){unpack('NN', "\x65");});
+        Assert.throws(function(){unpack('c', "");});
+        Assert.throws(function(){unpack('n*', "\x65");});
+        Assert.throws(function(){unpack('n', "\x65");});
     }
 };
