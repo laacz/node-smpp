@@ -198,7 +198,7 @@ module.exports = {
             esm_class: 1,
             data_coding: 1
         };
-
+        
         PDUFactory.fromStruct(Constants.commands.data_sm, Constants.command_statuses.esme_rok, 99, params, function(err, pdu) {
             Assert.isNull(err, "Unexpected error #1: " + (err ? err.message : ''));
             PDUFactory.response(pdu, 0, {message_id: 'abc'}, function(err2, pdu2) {
@@ -206,6 +206,90 @@ module.exports = {
                 Assert.ok(pdu2.header.command_id === ((pdu.header.command_id | 0x80000000)>>>0), 'Command id is not *_resp');
                 Assert.ok(pdu2.header.squence_number === pdu.header.squence_number, 'Sequence_number for both commands should match');
             });
+        });
+        
+        
+    },
+    
+    'PDUFactory.bind_transceiver' : function() {
+        var params = {
+            system_id: 'ffoofoofo',
+            password: 'barbarb',
+            system_type: 'ESME',
+            interface_version: 0x34,
+            addr_ton: 0,
+            addr_npi: 0,
+            address_range: ''
+            };
+        
+        PDUFactory.bind_transceiver(params, function(err, pdu){
+            Assert.eql(params, pdu.mandatory);
+            Assert.isNull(err);
+            PDUFactory.fromBuffer(pdu.buffer, function(err, pdu){
+                Assert.eql(params, pdu.mandatory);
+                Assert.isNull(err);
+            });
+        });
+    },
+    
+    'PDUFactory.bind_transmitter' : function() {
+        var params = {
+            system_id: 'ffoofoofo',
+            password: 'barbarb',
+            system_type: 'ESME',
+            interface_version: 0x34,
+            addr_ton: 0,
+            addr_npi: 0,
+            address_range: ''
+            };
+        
+        PDUFactory.bind_transmitter(params, function(err, pdu){
+            Assert.eql(params, pdu.mandatory);
+            Assert.isNull(err);
+            PDUFactory.fromBuffer(pdu.buffer, function(err, pdu){
+                Assert.eql(params, pdu.mandatory);
+                Assert.isNull(err);
+            });
+        });
+    },
+    
+    'PDUFactory.bind_receiver' : function() {
+        var params = {
+            system_id: 'ffoofoofo',
+            password: 'barbarb',
+            system_type: 'ESME',
+            interface_version: 0x34,
+            addr_ton: 0,
+            addr_npi: 0,
+            address_range: ''
+            };
+        
+        PDUFactory.bind_receiver(params, function(err, pdu){
+            Assert.eql(params, pdu.mandatory);
+            Assert.isNull(err);
+            PDUFactory.fromBuffer(pdu.buffer, function(err, pdu){
+                Assert.eql(params, pdu.mandatory);
+                Assert.isNull(err);
+            });
+        });
+    },
+    
+    'PDU.is_response' : function() {
+        var params = {
+            system_id: 'ffoofoofo',
+            password: 'barbarb',
+            system_type: 'ESME',
+            interface_version: 0x34,
+            addr_ton: 0,
+            addr_npi: 0,
+            address_range: ''
+            };
+        
+        PDUFactory.bind_transceiver(params, function(err, pdu){
+            Assert.isNull(err, 'Error should not be thrown');
+            Assert.ok(pdu.is_response() === false, 'Should NOT be response');
+            pdu.header.command_id = Constants.commands.bind_transceiver_resp;
+            Assert.ok(pdu.is_response() === true, 'Should be response');
         });
     }
 
