@@ -173,23 +173,26 @@ module.exports = {
                    ];
 
         var buf, pdu, params, pdu2, k;
+        var frombuf = function() {
+            pdu = PDUFactory.fromBuffer(Buffer(octets, 'binary'));
+        };
+        var checkpdu2 = function(){
+            pdu2 = PDUFactory.fromStruct(pdu.header.command_id, pdu.header.command_status, pdu.header.sequence_number, params);
+            Assert.ok(pdu2.buffer.toString() === pdu.buffer.toString());
+            Assert.eql(pdu2.buffer.mandatory, pdu.buffer.mandatory);
+            Assert.eql(pdu2.buffer.optional, pdu.buffer.optional);
+        };
+
         for (buf in bufs) {
             octets = bufs[buf];
-            Assert.doesNotThrow(function(){
-                pdu = PDUFactory.fromBuffer(Buffer(octets, 'binary'));
-            });
+            Assert.doesNotThrow(frombuf);
 
             params = pdu.mandatory;
             for (k in pdu.optional) {
                 params[k] = pdu.optional[k];
             }
 
-            Assert.doesNotThrow(function(){
-                pdu2 = PDUFactory.fromStruct(pdu.header.command_id, pdu.header.command_status, pdu.header.sequence_number, params);
-                Assert.ok(pdu2.buffer.toString() === pdu.buffer.toString());
-                Assert.eql(pdu2.buffer.mandatory, pdu.buffer.mandatory);
-                Assert.eql(pdu2.buffer.optional, pdu.buffer.optional);
-            });
+            Assert.doesNotThrow(checkpdu2);
 
         }
         // console.log(msg.split('').reduce(function(a, b){ return (a.length == 1 ? '\\x' + a.charCodeAt(0).toString(16) : a) + '\\x' + b.charCodeAt(0).toString(16);}))
@@ -249,12 +252,12 @@ module.exports = {
             address_range: ''
             }
         };
-        params['bind_transmitter'] = params['bind_receiver'] = params['bind_transceiver'];
+        params.bind_transmitter = params.bind_receiver = params.bind_transceiver;
         var command, pdu, pdu2;
         for (command in params) {
-            var pdu = PDUFactory[command](params[command]);
+            pdu = PDUFactory[command](params[command]);
             Assert.eql(params[command], pdu.mandatory, 'Failed test on ' + command);
-            var pdu2 = PDUFactory.fromBuffer(pdu.buffer);
+            pdu2 = PDUFactory.fromBuffer(pdu.buffer);
             Assert.eql(params[command], pdu.mandatory, 'Failed test on ' + command);
             Assert.eql(pdu.buffer, pdu2.buffer, 'Failed test on ' + command);
         }
